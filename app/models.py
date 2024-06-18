@@ -15,8 +15,9 @@ class Alojamiento:
     """
 
     # creo que es mas prolijo disparar el constructor desde un diccionario donde se guarden los datos recibidos del Front
+    # Fede pone directamente las claves VER QUE ES MEJOR
     def __init__(self, dicAlojamientos):
-        # Preguntar si parece necesario el if "de Seguridad" por si entra un dato vacio
+        # Preguntar si parece necesario el if "de Seguridad" por si entra un dato vacio o None en lugar de ""??
         if dicAlojamientos == None:
             self.id = ""
             self.imagenRuta = ""
