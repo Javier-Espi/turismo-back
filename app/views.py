@@ -1,26 +1,54 @@
 from flask import jsonify
+from flask import request
 from app.models import Alojamiento
 
-# Funcion para agregar nuevo alojamiento a la BBDD
-def alta_nuevo_alojamiento():
-        pass
+#funcion que busca todo el listado de alojamientos
+def traer_json_alojamientos():
+        alojamientos_guardados = Alojamiento.get_all()
+        list_alojamientos = [ alojamiento.serialize() for alojamiento in alojamientos_guardados]
+        return jsonify(list_alojamientos)
 
-# Funcion que modifica los datos de un Alojamiento en la BBDD
-def modificar_alojamiento():
-        pass
+#funcion que busca un unico alojamiento por ID
+def traer_por_id_json_un_alojamiento(id):
+        alojamiento = Alojamiento.get_by_id(id)
+        if not alojamiento:
+                return jsonify({'message': 'Alojamiento no encontrado'}), 404
+        return jsonify(alojamiento.serialize())
+
+#funcion para cargar a la BBDD un Alojamiento Nuevo
+def alta_nuevo_alojamiento():
+        data = request.json
+        nuevo_alojamiento = Alojamiento(imagenRuta=data['imagenRuta'], cuit=data['cuit'], nombre=data['nombre'], web=data['web'], telefono=data['telefono'], direccion=data['direccion'], latitud=data['latitud'], longitud=data['longitud'], correo=data['correo'])
+        
+        nuevo_alojamiento.save()
+        return jsonify({'message': 'Alojamiento dado de alta con exito'}), 201
+
+#Funcion para modificar un alojamiento de la BBDD
+def modificar_alojamiento(id):
+        alojamiento = Alojamiento.get_by_id(id)
+        #if not alojamiento:
+        #return jsonify({'message': 'Alojamiento no encontrado'}), 404
+        data = request.json
+        alojamiento.cuit = data['cuit']
+        alojamiento.nombre = data['nombre']
+        alojamiento.web = data['web']
+        alojamiento.telefono = data['telefono']
+        alojamiento.direccion = data['direccion']
+        alojamiento.latitud = data['latitud']
+        alojamiento.longitud = data['longitud']
+        alojamiento.correo = data['correo']
+        alojamiento.save()
+        return jsonify({'message': 'Alojamiento modificado con exito'})
+
+def eliminar_alojamiento(id):
+        alojamiento = Alojamiento.get_by_id(id)
+        if not alojamiento:
+                return jsonify({'message': 'Alojamiento no encontrado en la Base de Datos'}), 404
+        alojamiento.delete()
+        return jsonify({'message': 'Alojamiento eliminado con exito'})
+
 
 # Funcion que agrega ruta a la imagen del nuevo alojamiento (quizas dentro de create_alojamiento no se aun)
 def completar_ruta_imagen_alojamiento():
         pass
-
-# Funcion que devuelve diccionario con todos los datos de los alojamientos en la BBDD
-def dic_alojamientos():
-        pass
-
-
-#funcion que busca todo el listado de las peliculas
-def traer_json_alojamientos():
-    alojamientos_guardados = Alojamiento.get_all()
-    list_alojamientos = [ alojamiento.serialize() for alojamiento in alojamientos_guardados]
-    return jsonify(list_alojamientos)
 

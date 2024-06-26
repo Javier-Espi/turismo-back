@@ -19,9 +19,9 @@ class Alojamiento:
 
     # creo que es mas prolijo disparar el constructor desde un diccionario donde se guarden los datos recibidos del Front
     # Fede pone directamente las claves VER QUE ES MEJOR
-    def __init__(self, imagen_ruta=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
+    def __init__(self, imagenRuta=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
             self.id = id
-            self.imagen_ruta = imagen_ruta
+            self.imagenRuta = imagenRuta
             self.cuit = cuit
             self.nombre = nombre
             self.web = web
@@ -38,22 +38,51 @@ class Alojamiento:
         cursor = db.cursor()
         cursor.execute("SELECT * FROM alojamientos.`crud`")
         rows = cursor.fetchall()
-        alojamientos_sql = [Alojamiento(id=row[0], imagen_ruta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9]) for row in rows]
+        alojamientos_sql = [Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9]) for row in rows]
         cursor.close()
         return alojamientos_sql
 
+
+    @staticmethod
+    def get_by_id(id):
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM alojamientos.`crud` WHERE id = %s", (id,))
+        row = cursor.fetchone()
+        cursor.close()
+        if row:
+            return Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9])
+        return None
+    
     def save(self):
-        #logica para INSERT/UPDATE en base datos
-        pass
+        db = get_db()
+        cursor = db.cursor()
+        if self.id:
+            cursor.execute("""
+                UPDATE alojamientos.`crud` SET imagenRuta = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
+                WHERE id = %s
+            """, (self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo, self.id))
+        else:
+            cursor.execute("""
+                INSERT INTO alojamientos.`crud` (id, imagenRuta, cuit, nombre, web, telefono, direccion, latitud, longitud, correo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (None, self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo))
+            self.id = cursor.lastrowid
+        db.commit()
+        cursor.close()
+
 
     def delete(self):
-        #logica para hacer un DELETE en la BASE
-        pass
-    
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute("DELETE FROM alojamientos.`crud` WHERE id = %s", (self.id,))
+        db.commit()
+        cursor.close()
+
+
     def serialize(self):
         return {
             'id': self.id,
-            'imagen_ruta': self.imagen_ruta,
+            'imagenRuta': self.imagenRuta,
             'cuit': self.cuit,
             'nombre': self.nombre,
             'web': self.web,
