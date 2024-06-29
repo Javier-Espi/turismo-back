@@ -4,7 +4,7 @@ class Alojamiento:
     """
     Representa los datos de cada establecimiento de servicios de hospedaje ubicado en la zona
     y registrado de forma oficial como tal ante la autoridad municipal.
-    Se reciben los siguientes atributos de Front:
+    Se reciben los siguientes atributos de Frontend:
         'cuit': Cuit del titular. Dato obligatorio y verificado en front.
         'nombre': Nombre comercial del alojamiento. Obligatorio y requiere estandarizar formato.
         'correo': Correo Electronico para comunicarse con el alojamiento.
@@ -14,11 +14,9 @@ class Alojamiento:
         'latitud': Posición geográfica, Latitud del Alojamiento. Obligatorio.
         'longitud': Posición geográfica, Longitud del Alojamiento. Obligatorio.
     Al ingresar un alta, se guardará el archivo de la imagen del establecimiento y se asignaran
-    valores durante el proceso de alta 'id' y a 'imagenRuta'
+    valores durante el proceso de alta 'id' y a 'imagenRuta' (por si hay algun problema con
+    la imagen por defecto se recibe y se carga una imagen generica con texto imagen en proceso de verificacion)
     """
-
-    # creo que es mas prolijo disparar el constructor desde un diccionario donde se guarden los datos recibidos del Front
-    # Fede pone directamente las claves VER QUE ES MEJOR
     def __init__(self, imagenRuta=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
             self.id = id
             self.imagenRuta = imagenRuta
@@ -36,7 +34,7 @@ class Alojamiento:
     def get_all():
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM alojamientos.`crud`")
+        cursor.execute("SELECT * FROM crud")
         rows = cursor.fetchall()
         alojamientos_sql = [Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9]) for row in rows]
         cursor.close()
@@ -47,7 +45,7 @@ class Alojamiento:
     def get_by_id(id):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM alojamientos.`crud` WHERE id = %s", (id,))
+        cursor.execute("SELECT * FROM crud WHERE id = %s", (id,))
         row = cursor.fetchone()
         cursor.close()
         if row:
@@ -59,12 +57,12 @@ class Alojamiento:
         cursor = db.cursor()
         if self.id:
             cursor.execute("""
-                UPDATE alojamientos.`crud` SET imagenRuta = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
+                UPDATE crud SET imagenRuta = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
                 WHERE id = %s
             """, (self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo, self.id))
         else:
             cursor.execute("""
-                INSERT INTO alojamientos.`crud` (id, imagenRuta, cuit, nombre, web, telefono, direccion, latitud, longitud, correo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO crud (id, imagenRuta, cuit, nombre, web, telefono, direccion, latitud, longitud, correo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (None, self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo))
             self.id = cursor.lastrowid
         db.commit()
@@ -74,7 +72,7 @@ class Alojamiento:
     def delete(self):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("DELETE FROM alojamientos.`crud` WHERE id = %s", (self.id,))
+        cursor.execute("DELETE FROM crud WHERE id = %s", (self.id,))
         db.commit()
         cursor.close()
 

@@ -26,8 +26,8 @@ def alta_nuevo_alojamiento():
 #Funcion para modificar un alojamiento de la BBDD
 def modificar_alojamiento(id):
         alojamiento = Alojamiento.get_by_id(id)
-        #if not alojamiento:
-        #return jsonify({'message': 'Alojamiento no encontrado'}), 404
+        if not alojamiento:
+                return jsonify({'message': 'Alojamiento no encontrado'}), 404
         data = request.json
         alojamiento.cuit = data['cuit']
         alojamiento.nombre = data['nombre']
@@ -47,8 +47,4 @@ def eliminar_alojamiento(id):
         alojamiento.delete()
         return jsonify({'message': 'Alojamiento eliminado con exito'})
 
-
-# Funcion que agrega ruta a la imagen del nuevo alojamiento (quizas dentro de create_alojamiento no se aun)
-def completar_ruta_imagen_alojamiento():
-        pass
 
