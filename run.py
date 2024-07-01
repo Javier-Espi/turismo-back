@@ -1,7 +1,11 @@
 from flask import Flask
 from flask_cors import CORS
 from app.database import init_app
-from app.views import *
+from app.views import traer_json_alojamientos
+from app.views import traer_por_id_json_un_alojamiento
+from app.views import modificar_alojamiento
+from app.views import alta_nuevo_alojamiento
+from app.views import eliminar_alojamiento
 
 # Creo instancia de Flask
 app = Flask(__name__)
