@@ -4,7 +4,7 @@ class Alojamiento:
     """
     Representa los datos de cada establecimiento de servicios de hospedaje ubicado en la zona
     y registrado de forma oficial como tal ante la autoridad municipal.
-    Se reciben los siguientes atributos de Frontend:
+    Se reciben los siguientes atributos de Front:
         'cuit': Cuit del titular. Dato obligatorio y verificado en front.
         'nombre': Nombre comercial del alojamiento. Obligatorio y requiere estandarizar formato.
         'correo': Correo Electronico para comunicarse con el alojamiento.
@@ -14,9 +14,9 @@ class Alojamiento:
         'latitud': Posición geográfica, Latitud del Alojamiento. Obligatorio.
         'longitud': Posición geográfica, Longitud del Alojamiento. Obligatorio.
     Al ingresar un alta, se guardará el archivo de la imagen del establecimiento y se asignaran
-    valores durante el proceso de alta 'id' y a 'imagenRuta' (por si hay algun problema con
-    la imagen por defecto se recibe y se carga una imagen generica con texto imagen en proceso de verificacion)
+    valores durante el proceso de alta 'id' y a 'imagenRuta'
     """
+
     def __init__(self, imagenRuta=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
             self.id = id
             self.imagenRuta = imagenRuta
@@ -28,9 +28,9 @@ class Alojamiento:
             self.latitud = latitud
             self.longitud = longitud
             self.correo = correo
-            
 
-    @staticmethod    
+
+    @staticmethod
     def get_all():
         db = get_db()
         cursor = db.cursor()
@@ -45,20 +45,20 @@ class Alojamiento:
     def get_by_id(id):
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM crud WHERE id = %s", (id,))
+        cursor.execute("SELECT * FROM crud WHERE id = '%s'", (id,))
         row = cursor.fetchone()
         cursor.close()
         if row:
             return Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9])
         return None
-    
+
     def save(self):
         db = get_db()
         cursor = db.cursor()
         if self.id:
             cursor.execute("""
                 UPDATE crud SET imagenRuta = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
-                WHERE id = %s
+                WHERE id = '%s'
             """, (self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo, self.id))
         else:
             cursor.execute("""
@@ -85,10 +85,8 @@ class Alojamiento:
             'nombre': self.nombre,
             'web': self.web,
             'telefono': self.telefono,
-            'direccion':self.direccion, 
+            'direccion':self.direccion,
             'latitud': self.latitud,
             'longitud': self.longitud,
             'correo': self.correo,
         }
-    
-
