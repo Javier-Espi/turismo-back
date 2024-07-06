@@ -15,11 +15,13 @@ class Alojamiento:
         'longitud': Posición geográfica, Longitud del Alojamiento. Obligatorio.
     Al ingresar un alta, se guardará el archivo de la imagen del establecimiento y se asignaran
     valores durante el proceso de alta 'id' y a 'imagenRuta'
+    Se agrega el valor de ID de la imagen para poder borrarla al borrar el item
     """
 
-    def __init__(self, imagenRuta=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
+    def __init__(self, imagenRuta=None, imagenId=None, id=None, cuit=None, nombre=None, web=None, telefono=None, direccion=None, latitud=None, longitud=None, correo=None):
             self.id = id
             self.imagenRuta = imagenRuta
+            self.imagenId = imagenId
             self.cuit = cuit
             self.nombre = nombre
             self.web = web
@@ -36,7 +38,7 @@ class Alojamiento:
         cursor = db.cursor()
         cursor.execute("SELECT * FROM crud")
         rows = cursor.fetchall()
-        alojamientos_sql = [Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9]) for row in rows]
+        alojamientos_sql = [Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9], imagenId=row[10]) for row in rows]
         cursor.close()
         return alojamientos_sql
 
@@ -49,7 +51,7 @@ class Alojamiento:
         row = cursor.fetchone()
         cursor.close()
         if row:
-            return Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9])
+            return Alojamiento(id=row[0], imagenRuta=row[1], cuit=row[2], nombre=row[3], web=row[4], telefono=row[5], direccion=row[6], latitud=row[7], longitud=row[8], correo=row[9], imagenId=row[10])
         return None
 
     def save(self):
@@ -57,13 +59,13 @@ class Alojamiento:
         cursor = db.cursor()
         if self.id:
             cursor.execute("""
-                UPDATE crud SET imagenRuta = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
+                UPDATE crud SET imagenRuta = %s, imagenID = %s, cuit = %s, nombre = %s, web = %s, telefono = %s, direccion = %s, latitud = %s, longitud = %s, correo = %s
                 WHERE id = '%s'
-            """, (self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo, self.id))
+            """, (self.imagenRuta, self.imagenId, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo, self.id))
         else:
             cursor.execute("""
-                INSERT INTO crud (id, imagenRuta, cuit, nombre, web, telefono, direccion, latitud, longitud, correo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (None, self.imagenRuta, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo))
+                INSERT INTO crud (id, imagenRuta, imagenID, cuit, nombre, web, telefono, direccion, latitud, longitud, correo) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (None, self.imagenRuta, self.imagenId, self.cuit, self.nombre, self.web, self.telefono, self.direccion, self.latitud, self.longitud, self.correo))
             self.id = cursor.lastrowid
         db.commit()
         cursor.close()
@@ -81,6 +83,7 @@ class Alojamiento:
         return {
             'id': self.id,
             'imagenRuta': self.imagenRuta,
+            'imagenId': self.imagenId,
             'cuit': self.cuit,
             'nombre': self.nombre,
             'web': self.web,

@@ -1,7 +1,7 @@
 from flask import jsonify
 from flask import request
 from app.models import Alojamiento
-from app.files_cloud import ruta_nuevo_archivo_imagen
+from app.files_cloud import datos_nuevo_archivo_imagen, borrar_de_cloudinary_por_id
 
 
 #funcion que busca todo el listado de alojamientos
@@ -22,16 +22,20 @@ def eliminar_alojamiento(id):
         if not alojamiento:
                 return jsonify({'message': 'Alojamiento no encontrado en la Base de Datos'}), 404
         alojamiento.delete()
+        if alojamiento.imagenId:
+                borrar_de_cloudinary_por_id(alojamiento.imagenId)
         return jsonify({'message': 'Alojamiento eliminado con exito'})
 
 #funcion para cargar a la BBDD un Alojamiento Nuevo POR FORM
 def alta_nuevo_alojamiento_form():
         data = request.form
-        nuevo_alojamiento = Alojamiento(imagenRuta=data['imagenRuta'], cuit=data['cuit'], nombre=data['nombre'], web=data['web'], telefono=data['telefono'], direccion=data['direccion'], latitud=data['latitud'], longitud=data['longitud'], correo=data['correo'])
+        nuevo_alojamiento = Alojamiento(imagenRuta=data['imagenRuta'], imagenId = None, cuit=data['cuit'], nombre=data['nombre'], web=data['web'], telefono=data['telefono'], direccion=data['direccion'], latitud=data['latitud'], longitud=data['longitud'], correo=data['correo'])
         files = request.files
         imagen = files['imagen']
         if imagen:
-                nuevo_alojamiento.imagenRuta = ruta_nuevo_archivo_imagen(imagen)
+                datos_nueva_imagen = datos_nuevo_archivo_imagen(imagen)
+                nuevo_alojamiento.imagenRuta = datos_nueva_imagen['imagenRuta']
+                nuevo_alojamiento.imagenId = datos_nueva_imagen['imagenId']
         nuevo_alojamiento.save()
         return jsonify({'message': 'Alojamiento dado de alta con exito'}), 201
 
@@ -44,7 +48,11 @@ def modificar_alojamiento_form(id):
         files = request.files
         imagen = files['imagen']
         if imagen:
-                alojamiento.rutaImagen = ruta_nuevo_archivo_imagen(imagen)
+                if alojamiento.imagenId:
+                        borrar_de_cloudinary_por_id(alojamiento.imagenId)
+                datos_nueva_imagen = datos_nuevo_archivo_imagen(imagen)
+                alojamiento.imagenRuta = datos_nueva_imagen['imagenRuta']
+                alojamiento.imagenId = datos_nueva_imagen['imagenId']
         alojamiento.cuit = data['cuit']
         alojamiento.nombre = data['nombre']
         alojamiento.web = data['web']

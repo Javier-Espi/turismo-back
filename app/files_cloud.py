@@ -1,8 +1,10 @@
 import cloudinary
 import cloudinary.uploader
 import os
-from threading import Event
+#from threading import Event
 from dotenv import load_dotenv
+from cloudinary import CloudinaryImage
+
 
 
 # Cargar variables de entorno desde el archivo .env para Cloudinary.com
@@ -14,14 +16,21 @@ cloudinary.config(
         api_secret=os.getenv('API_SECRET')
         )
 
-#funcion que envia archivo imagene a cloudinary y recibe (retorna) la ruta
-def ruta_nuevo_archivo_imagen(imagen, folder = 'Alojamientos'):
-        print('intentando conectar cloudinary')
-        result = cloudinary.uploader.upload(imagen)
-        print ('**********************************************************************')
-        Event().wait(3) # NO SE SI ES NECESARIO
-        print (result)
-        nueva_ruta = result["secure_url"]
-        print (nueva_ruta)
-        print ('**********************************************************************')
-        return nueva_ruta
+#funcion que envia archivo de imagen a cloudinary y recibe (retorna) la ruta y el Id (para borrarlo o gestionarlo)
+def datos_nuevo_archivo_imagen(imagen):
+        result = cloudinary.uploader.upload(
+                imagen,
+                asset_folder = 'Alojamientos',
+                transformation=[
+                {"width": 500, "height": 500, "crop": "fill", "gravity": "auto"},
+                {"quality": "auto", "fetch_format": "auto"}
+                ]
+        )
+        return {'imagenRuta': result["secure_url"], 'imagenId': result['public_id']}
+
+#funcion para borrar un archivo de cloudinary pasandole el public_id
+def borrar_de_cloudinary_por_id(public_id):
+        resultado = cloudinary.uploader.destroy(public_id)
+        print('************************************************************')
+        print(resultado)
+        print('************************************************************')

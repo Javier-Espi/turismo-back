@@ -24,5 +24,5 @@ app.route('/api/alojamientos',methods=['POST'])(alta_nuevo_alojamiento_form)
 app.route('/api/alojamientos/<int:id>',methods=['PUT'])(modificar_alojamiento_form)
 
 #Permite separa el codigo que se ejecuta cuando se corre el archivo
-#if __name__=='__main__':
-#    app.run(debug=True)
+if __name__=='__main__':
+    app.run(debug=True)
