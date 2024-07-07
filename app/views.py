@@ -3,7 +3,6 @@ from flask import request
 from app.models import Alojamiento
 from app.files_cloud import datos_nuevo_archivo_imagen, borrar_de_cloudinary_por_id
 
-
 #funcion que busca todo el listado de alojamientos
 def traer_json_alojamientos():
         alojamientos_guardados = Alojamiento.get_all()
